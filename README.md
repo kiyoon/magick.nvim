@@ -4,11 +4,15 @@
 
 Why? It's [`3rd/image.nvim`](https://github.com/3rd/image.nvim)'s dependency, and the plugin was quite difficult to install on machines without sudo privilege.
 
-You also need ImageMagick v7 shared library and headers.
+## 🛠️ Installing
 
-## Installing [`3rd/image.nvim`](https://github.com/3rd/image.nvim).
+### First, install ImageMagick
 
-### First, install ImageMagick locally
+- Mac:
+  - `brew install imagemagick`
+  - `brew install pkg-config`
+- Ubuntu:
+  - `sudo apt install libmagickwand-dev`
 
 If it's hard for you to use a package manager, run this script to install ImageMagick in `~/.local`.  
 This simple downloads the appimage and extracts it to `~/.local`, excluding the `libglib` shared library.
@@ -36,9 +40,9 @@ else
 fi
 ```
 
-### Second, configure dependency of `image.nvim`
+### Then, install this plugin
 
-Set this repo as a dependency of `image.nvim`. With lazy.nvim:
+For example, set this repo as a dependency of `3rd/image.nvim`. With lazy.nvim:
 
 ```lua
   {
@@ -49,6 +53,8 @@ Set this repo as a dependency of `image.nvim`. With lazy.nvim:
     -- ...
   },
 ```
+
+Now you can `require("magick")` to use ImageMagick in neovim!
 
 ## Notes
 
