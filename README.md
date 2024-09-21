@@ -15,7 +15,7 @@ Why? It's [`3rd/image.nvim`](https://github.com/3rd/image.nvim)'s dependency, an
   - `sudo apt install libmagickwand-dev`
 
 If it's hard for you to use a package manager, run this script to install ImageMagick in `~/.local`.  
-This simple downloads the appimage and extracts it to `~/.local`, excluding the `libglib` shared library.
+This simply downloads the appimage and extracts it to `~/.local`, excluding the `libglib` shared library.
 
 ```bash
 if ! command -v magick &> /dev/null; then
