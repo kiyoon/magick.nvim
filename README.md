@@ -14,10 +14,11 @@ Why? It's [`3rd/image.nvim`](https://github.com/3rd/image.nvim)'s dependency, an
 - Ubuntu:
   - `sudo apt install libmagickwand-dev`
 
-If it's hard for you to use a package manager, run this script to install ImageMagick in `~/.local`.  
+If it's hard for you to use a package manager (e.g. on Linux servers), run this script to install ImageMagick in `~/.local`.  
 This simply downloads the appimage and extracts it to `~/.local`, excluding the `libglib` shared library.
 
 ```bash
+# WARN: Only compatible with x86-64 Linux.
 if ! command -v magick &> /dev/null; then
 	echo "ImageMagick could not be found. Installing in ~/.local"
 	mkdir -p ~/.local
