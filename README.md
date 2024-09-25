@@ -1,10 +1,10 @@
-# magick.nvim
+# 🪄 magick.nvim
 
 [luarocks magick](https://github.com/leafo/magick) v1.6.0 clone, but re-structured to make it easier to be installed with neovim.
 
 Why? It's [`3rd/image.nvim`](https://github.com/3rd/image.nvim)'s dependency, and the plugin was quite difficult to install on machines without sudo privilege.
 
-## 🛠️ Installing
+## 🛠️ Installation
 
 ### First, install ImageMagick
 
@@ -57,7 +57,7 @@ For example, set this repo as a dependency of `3rd/image.nvim`. With lazy.nvim:
 
 Now you can `require("magick")` to use ImageMagick in neovim!
 
-## Notes
+## 📓 Notes
 
 The original library looks for the appropriate shared library using `pkg-config` but it wasn't able to find the locally installed ones.  
 So I modified the `wand/lib.lua` as follows:
