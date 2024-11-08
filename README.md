@@ -48,6 +48,7 @@ For example, set this repo as a dependency of `3rd/image.nvim`. With lazy.nvim:
 ```lua
   {
     "3rd/image.nvim",
+    build = false, -- do not build with hererocks
     dependencies = {
       "kiyoon/magick.nvim",
     },
