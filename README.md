@@ -4,6 +4,9 @@
 
 Why? It's [`3rd/image.nvim`](https://github.com/3rd/image.nvim)'s dependency, and the plugin was quite difficult to install on machines without sudo privilege.
 
+> [!NOTE]
+> NixOS users may not need this plugin. See https://github.com/kiyoon/magick.nvim/issues/1
+
 ## 🛠️ Installation
 
 ### First, install ImageMagick
