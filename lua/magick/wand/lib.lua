@@ -117,8 +117,9 @@ ffi.cdef [[  typedef void MagickWand;
 ]]
 local get_flags
 get_flags = function()
+  local nvim_data_pkgconfig = vim.fn.stdpath("data") .. "/magick/lib/pkgconfig"
   local proc = io.popen(
-    'PKG_CONFIG_PATH="$HOME/.local/lib/pkgconfig:/home/linuxbrew/.linuxbrew/lib/pkgconfig:$PKG_CONFIG_PATH" pkg-config --cflags --libs MagickWand',
+    'PKG_CONFIG_PATH=' .. nvim_data_pkgconfig .. ':"$HOME/.local/lib/pkgconfig:/home/linuxbrew/.linuxbrew/lib/pkgconfig:$PKG_CONFIG_PATH" pkg-config --cflags --libs MagickWand',
     "r"
   )
   local flags = proc:read "*a"
@@ -135,6 +136,7 @@ get_filters = function()
     "MagickCore/resample.h",
   }
   local prefixes = {
+    vim.fn.stdpath("data") .. "/magick/include/ImageMagick",
     "/usr/include/ImageMagick",
     "/usr/local/include/ImageMagick",
     vim.fn.expand "$HOME" .. "/.local/include/ImageMagick",
