@@ -22,7 +22,7 @@ This simply downloads the appimage and extracts it to `~/.local/share/nvim/magic
 
 ```bash
 # WARN: Only compatible with x86-64 Linux.
-INSTALL_DIR=$(nvim --headless +'lua io.write(vim.fn.stdpath("data"))' +qa)/magick  # ~/.local/share/nvim/magick
+INSTALL_DIR=$(nvim --clean --headless +'lua io.write(vim.fn.stdpath("data"))' +qa)/magick  # ~/.local/share/nvim/magick
 mkdir -p "$INSTALL_DIR"
 curl -s https://api.github.com/repos/ImageMagick/ImageMagick/releases/latest \
     | grep "browser_download_url.*ImageMagick-.*-gcc-x86_64.AppImage" \
