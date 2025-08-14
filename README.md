@@ -63,20 +63,47 @@ The original library looks for the appropriate shared library using `pkg-config`
 So I modified the `wand/lib.lua` as follows:
 
 ```lua
-  local nvim_data_pkgconfig = vim.fn.stdpath("data") .. "/magick/lib/pkgconfig"
-  local proc = io.popen(
-    'PKG_CONFIG_PATH=' .. nvim_data_pkgconfig .. ':"$HOME/.local/lib/pkgconfig:/home/linuxbrew/.linuxbrew/lib/pkgconfig:$PKG_CONFIG_PATH" pkg-config --cflags --libs MagickWand',
-    "r"
-  )
+-- 1. original pkg-config command now looks for the shared library in nvim data directory
+local nvim_data_pkgconfig = vim.fn.stdpath("data") .. "/magick/lib/pkgconfig"
+local proc = io.popen(
+  [[PKG_CONFIG_PATH="]]
+      .. nvim_data_pkgconfig
+      .. [[:$HOME/.local/lib/pkgconfig:/home/linuxbrew/.linuxbrew/lib/pkgconfig:$PKG_CONFIG_PATH" pkg-config --cflags --libs MagickWand]],
+  "r"
+)
 
-  --------------------
+--------------------
+-- 2. Search for headers in more directories (note specifically, nvim data directory)
 
-  local prefixes = {
-    vim.fn.stdpath("data") .. "/magick/include/ImageMagick",
-    "/usr/include/ImageMagick",
-    "/usr/local/include/ImageMagick",
-    vim.fn.expand "$HOME" .. "/.local/include/ImageMagick",
-    "/home/linuxbrew/.linuxbrew/include/ImageMagick",
-    -- ...
-  }
+local prefixes = {
+  vim.fn.stdpath("data") .. "/magick/include/ImageMagick",
+  "/usr/include/ImageMagick",
+  "/usr/local/include/ImageMagick",
+  vim.fn.expand "$HOME" .. "/.local/include/ImageMagick",
+  "/home/linuxbrew/.linuxbrew/include/ImageMagick",
+  -- ...
+}
+
+--------------------
+-- 3. Use absolute path (nvim data directory) of the shared library instead of the relative path
+-- This avoids users having to set `LD_LIBRARY_PATH` or `DYLD_LIBRARY_PATH` manually.
+
+--- e.g. libMagickWand-7.Q16HDRI.so
+local function get_lib_name()
+	local lname = get_flags():match("-l(MagickWand[^%s]*)")
+	local suffix
+	if ffi.os == "OSX" then
+		suffix = ".dylib"
+	elseif ffi.os == "Windows" then
+		suffix = ".dll"
+	else
+		suffix = ".so"
+	end
+	return lname and "lib" .. lname .. suffix
+end
+
+local lib_name = get_lib_name()
+local lib_path_in_nvim_data = lib_name and vim.fn.stdpath("data") .. "/magick/lib/" .. lib_name
+
+lib = try_to_load(lib_path_in_nvim_data, "MagickWand", lib_name)
 ```

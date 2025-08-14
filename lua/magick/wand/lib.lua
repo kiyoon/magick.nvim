@@ -1,6 +1,6 @@
-local ffi = require "ffi"
+local ffi = require("ffi")
 local lib
-ffi.cdef [[  typedef void MagickWand;
+ffi.cdef([[  typedef void MagickWand;
   typedef void PixelWand;
 
   typedef int MagickBooleanType;
@@ -114,130 +114,140 @@ ffi.cdef [[  typedef void MagickWand;
   MagickBooleanType MagickSetImageDepth(MagickWand *,const unsigned long);
   unsigned long MagickGetImageDepth(MagickWand *);
 
-]]
+]])
 local get_flags
 get_flags = function()
-  local nvim_data_pkgconfig = vim.fn.stdpath("data") .. "/magick/lib/pkgconfig"
-  local proc = io.popen(
-    'PKG_CONFIG_PATH=' .. nvim_data_pkgconfig .. ':"$HOME/.local/lib/pkgconfig:/home/linuxbrew/.linuxbrew/lib/pkgconfig:$PKG_CONFIG_PATH" pkg-config --cflags --libs MagickWand',
-    "r"
-  )
-  local flags = proc:read "*a"
-  get_flags = function()
-    return flags
-  end
-  proc:close()
-  return flags
+	local nvim_data_pkgconfig = vim.fn.stdpath("data") .. "/magick/lib/pkgconfig"
+	local proc = io.popen(
+		[[PKG_CONFIG_PATH="]]
+			.. nvim_data_pkgconfig
+			.. [[:$HOME/.local/lib/pkgconfig:/home/linuxbrew/.linuxbrew/lib/pkgconfig:$PKG_CONFIG_PATH" pkg-config --cflags --libs MagickWand]],
+		"r"
+	)
+	local flags = proc:read("*a")
+	get_flags = function()
+		return flags
+	end
+	proc:close()
+	return flags
 end
 local get_filters
 get_filters = function()
-  local suffixes = {
-    "magick/resample.h",
-    "MagickCore/resample.h",
-  }
-  local prefixes = {
-    vim.fn.stdpath("data") .. "/magick/include/ImageMagick",
-    "/usr/include/ImageMagick",
-    "/usr/local/include/ImageMagick",
-    vim.fn.expand "$HOME" .. "/.local/include/ImageMagick",
-    "/home/linuxbrew/.linuxbrew/include/ImageMagick",
-    unpack((function()
-      local _accum_0 = {}
-      local _len_0 = 1
-      for p in get_flags():gmatch "-I([^%s]+)" do
-        _accum_0[_len_0] = p
-        _len_0 = _len_0 + 1
-      end
-      return _accum_0
-    end)()),
-  }
-  for _index_0 = 1, #prefixes do
-    local p = prefixes[_index_0]
-    for _index_1 = 1, #suffixes do
-      local suffix = suffixes[_index_1]
-      local full = tostring(p) .. "/" .. tostring(suffix)
-      do
-        local f = io.open(full)
-        if f then
-          local content
-          do
-            local _with_0 = f:read "*a"
-            f:close()
-            content = _with_0
-          end
-          local filter_types = content:match "(typedef enum.-FilterTypes?;)"
-          if filter_types then
-            ffi.cdef(filter_types)
-            if filter_types:match "FilterTypes;" then
-              return "FilterTypes"
-            end
-            return "FilterType"
-          end
-        end
-      end
-    end
-  end
-  return false
+	local suffixes = {
+		"magick/resample.h",
+		"MagickCore/resample.h",
+	}
+	local prefixes = {
+		vim.fn.stdpath("data") .. "/magick/include/ImageMagick",
+		"/usr/include/ImageMagick",
+		"/usr/local/include/ImageMagick",
+		vim.fn.expand("$HOME") .. "/.local/include/ImageMagick",
+		"/home/linuxbrew/.linuxbrew/include/ImageMagick",
+		unpack((function()
+			local _accum_0 = {}
+			local _len_0 = 1
+			for p in get_flags():gmatch("-I([^%s]+)") do
+				_accum_0[_len_0] = p
+				_len_0 = _len_0 + 1
+			end
+			return _accum_0
+		end)()),
+	}
+	for _index_0 = 1, #prefixes do
+		local p = prefixes[_index_0]
+		for _index_1 = 1, #suffixes do
+			local suffix = suffixes[_index_1]
+			local full = tostring(p) .. "/" .. tostring(suffix)
+			do
+				local f = io.open(full)
+				if f then
+					local content
+					do
+						local _with_0 = f:read("*a")
+						f:close()
+						content = _with_0
+					end
+					local filter_types = content:match("(typedef enum.-FilterTypes?;)")
+					if filter_types then
+						ffi.cdef(filter_types)
+						if filter_types:match("FilterTypes;") then
+							return "FilterTypes"
+						end
+						return "FilterType"
+					end
+				end
+			end
+		end
+	end
+	return false
 end
 local get_filter
 get_filter = function(name)
-  return lib[name .. "Filter"]
+	return lib[name .. "Filter"]
 end
 local can_resize
 do
-  local enum_name = get_filters()
-  if enum_name then
-    ffi.cdef([[    MagickBooleanType MagickResizeImage(MagickWand*,
+	local enum_name = get_filters()
+	if enum_name then
+		ffi.cdef([[    MagickBooleanType MagickResizeImage(MagickWand*,
       const size_t, const size_t,
       const ]] .. enum_name .. [[, const double);
   ]])
-    can_resize = true
-  end
+		can_resize = true
+	end
 end
 local try_to_load
 try_to_load = function(...)
-  local out
-  local _list_0 = {
-    ...,
-  }
-  for _index_0 = 1, #_list_0 do
-    local _continue_0 = false
-    repeat
-      local name = _list_0[_index_0]
-      if "function" == type(name) then
-        name = name()
-        if not name then
-          _continue_0 = true
-          break
-        end
-      end
-      if pcall(function()
-        out = ffi.load(name)
-      end) then
-        return out
-      end
-      _continue_0 = true
-    until true
-    if not _continue_0 then
-      break
-    end
-  end
-  return error("Failed to load ImageMagick (" .. tostring(...) .. ")")
+	local out
+	local _list_0 = {
+		...,
+	}
+	for _index_0 = 1, #_list_0 do
+		local _continue_0 = false
+		repeat
+			local name = _list_0[_index_0]
+			if "function" == type(name) then
+				name = name()
+				if not name then
+					_continue_0 = true
+					break
+				end
+			end
+			if pcall(function()
+				out = ffi.load(name)
+			end) then
+				return out
+			end
+			_continue_0 = true
+		until true
+		if not _continue_0 then
+			break
+		end
+	end
+	return error("Failed to load ImageMagick (" .. tostring(...) .. ")")
 end
-lib = try_to_load("MagickWand", function()
-  local lname = get_flags():match "-l(MagickWand[^%s]*)"
-  local suffix
-  if ffi.os == "OSX" then
-    suffix = ".dylib"
-  elseif ffi.os == "Windows" then
-    suffix = ".dll"
-  else
-    suffix = ".so"
-  end
-  return lname and "lib" .. lname .. suffix
-end)
+
+--- e.g. libMagickWand-7.Q16HDRI.so
+local function get_lib_name()
+	local lname = get_flags():match("-l(MagickWand[^%s]*)")
+	local suffix
+	if ffi.os == "OSX" then
+		suffix = ".dylib"
+	elseif ffi.os == "Windows" then
+		suffix = ".dll"
+	else
+		suffix = ".so"
+	end
+	return lname and "lib" .. lname .. suffix
+end
+
+local lib_name = get_lib_name()
+local lib_path_in_nvim_data = lib_name and vim.fn.stdpath("data") .. "/magick/lib/" .. lib_name
+
+lib = try_to_load(lib_path_in_nvim_data, "MagickWand", lib_name)
+
 return {
-  lib = lib,
-  can_resize = can_resize,
-  get_filter = get_filter,
+	lib = lib,
+	can_resize = can_resize,
+	get_filter = get_filter,
 }
