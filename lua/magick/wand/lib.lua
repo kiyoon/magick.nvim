@@ -121,7 +121,7 @@ get_flags = function()
 	local proc = io.popen(
 		[[PKG_CONFIG_PATH="]]
 			.. nvim_data_pkgconfig
-			.. [[:$HOME/.local/lib/pkgconfig:/home/linuxbrew/.linuxbrew/lib/pkgconfig:$PKG_CONFIG_PATH" pkg-config --cflags --libs MagickWand]],
+			.. [[:$HOME/.local/lib/pkgconfig:/opt/homebrew/opt/imagemagick/lib/pkgconfig:/opt/homebrew/lib/pkgconfig:/home/linuxbrew/.linuxbrew/lib/pkgconfig:$PKG_CONFIG_PATH" pkg-config --cflags --libs MagickWand]],
 		"r"
 	)
 	local flags = proc:read("*a")
